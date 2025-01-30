@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
-import json
+from flask_cors import CORS  
 
 app = Flask(__name__)
+
+CORS(app)
 
 def load_data():
     try:
@@ -13,7 +15,6 @@ def load_data():
 
 data = load_data()
 
-
 @app.route('/get_policies', methods=['GET'])
 def get_policies():
     if data:
@@ -21,17 +22,15 @@ def get_policies():
     else:
         return jsonify({"message": "data not found", "status": 404})
 
-
 @app.route("/search_policies", methods=["POST"])
 def search_policies():
     search_term = request.json.get('name', '').lower()
-    print(search_term,"check")
+    print(search_term, "check")
     result = [policy for policy in data if search_term in policy['name'].lower()]
     if result:
         return jsonify({"data": result, "status": 200, "message": "search results found"})
     else:
         return jsonify({"message": "no policies found", "status": 404})
-
 
 @app.route("/filter_policies", methods=["POST"])
 def filter_policies():
@@ -66,7 +65,7 @@ def filter_policies():
                 "message": "Policies filtered successfully",
                 "data": filtered_data
             })
-        
+
         return jsonify({
             "status": 404,
             "message": "No matching policies found",
